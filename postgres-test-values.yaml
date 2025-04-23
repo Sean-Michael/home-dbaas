@@ -1,0 +1,17 @@
+auth:
+  database: testdb
+  username: testuser
+  replicationUsername: readonly
+
+primary:
+  resources:
+    limits:
+      memory: 512Mi
+      cpu: 500m
+    requests:
+      memory: 256Mi
+      cpu: 100m
+  persistence:
+    size: 1Gi
+
+architecture: standalone
