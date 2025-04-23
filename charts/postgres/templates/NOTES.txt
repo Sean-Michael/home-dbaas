@@ -1,0 +1,15 @@
+PostgreSQL Database Instance
+
+Database name: {{ .Values.database.name }}
+Admin user: {{ .Values.database.user }}
+Admin password: <stored in secret {{ .Release.Name }}-postgres-secret>
+
+Connection details:
+  Host: {{ .Release.Name }}-postgres
+  Port: {{ .Values.service.port }}
+
+To get your database password:
+  kubectl get secret {{ .Release.Name }}-postgres-secret -o jsonpath="{.data.POSTGRES_PASSWORD}" | base64 --decode
+
+To connect to your database from within the cluster:
+  kubectl run {{ .Release.Name }}-postgres-client --rm --tty -i --restart='Never' --image postgres:{{ .Values.postgres.version }} --env="PGPASSWORD=$PASSWORD" -- psql -h {{ .Release.Name }}-postgres -U {{ .Values.database.user }} -d {{ .Values.database.name }}

@@ -1,0 +1,27 @@
+# Database configuration
+database:
+  name: myapp
+  user: app_user
+  password: "" # We'll generate this if empty
+
+# PostgreSQL configuration
+postgres:
+  version: "15.3"
+  port: 5432
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "100m"
+    limits:
+      memory: "512Mi"
+      cpu: "500m"
+
+# Storage configuration
+storage:
+  size: "1Gi"
+  storageClass: ""  # Use default storage class if empty
+
+# Network configuration
+service:
+  type: ClusterIP
+  port: 5432

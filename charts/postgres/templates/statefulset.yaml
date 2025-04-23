@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ .Release.Name }}-postgres
+  labels:
+    {{ include "postgres.labels" . | nindent 4 }}
+spec:
+  serviceName: {{ .Release.Name }}-postgres
+  replicas: 1
+  selector:
+    matchLabels:
+      {{ include "postgres.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{ include "postgres.selectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+      - name: postgres
+        image: postgres:{{ .Values.postgres.version }}
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: {{ .Values.postgres.port }}
+          name: postgres
+        env:
+        - name: POSTGRES_DB
+          value: {{ .Values.database.name }}
+        - name: POSTGRES_USER
+          value: {{ .Values.database.user }}
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Release.Name }}-postgres-secret
+              key: POSTGRES_PASSWORD
+        resources:
+          {{- toYaml .Values.postgres.resources | nindent 10 }}
+        volumeMounts:
+        - name: data
+          mountPath: /var/lib/postgresql/data
+        - name: init-script
+          mountPath: /docker-entrypoint-initdb.d
+      volumes:
+      - name: init-script
+        configMap:
+          name: {{ .Release.Name }}-postgres-init
+  volumeClaimTemplates:
+  - metadata:
+      name: data
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      {{- if .Values.storage.storageClass }}
+      storageClassName: {{ .Values.storage.storageClass }}
+      {{- end }}
+      resources:
+        requests:
+          storage: {{ .Values.storage.size }}
