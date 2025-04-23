@@ -6,6 +6,8 @@ import os
 import base64
 from kubernetes import client, config
 from kubernetes.client.rest import ApiException
+import json
+import os
 
 app = Flask(__name__)
 CORS(app)
@@ -19,7 +21,17 @@ core_v1 = client.CoreV1Api()
 apps_v1 = client.AppsV1Api()
 custom_objects = client.CustomObjectsApi()
 
+DATA_FILE = '/app/data/databases.json'
+os.makedirs(os.path.dirname(DATA_FILE), exist_ok=True)
+
 deployed_databases = {}
+if os.path.exists(DATA_FILE):
+    with open(DATA_FILE, 'r') as f:
+        deployed_databases = json.load(f)
+
+def save_databases():
+    with open(DATA_FILE, 'w') as f:
+        json.dump(deployed_databases, f)
 
 @app.route('/api/databases', methods=['GET'])
 def list_databases():
@@ -151,6 +163,7 @@ def create_database():
             }
             
             deployed_databases[deployment_id] = deployment
+            save_databases()
             return jsonify(deployment), 201
             
         # TODO: Add similar logic for MySQL, MongoDB, and Kafka

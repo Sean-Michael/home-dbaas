@@ -1,25 +1,42 @@
-# HomeLab Database-as-a-Service (DBaas)
+# HomeLab Database-as-a-Service (DBaaS)
 
-This project allows for the creation of a home Database as a Service for local development. 
+This project provides a platform for creating and managing databases as a service on a home Kubernetes cluster. It is designed for local development and testing, enabling users to quickly deploy and manage common database applications.
 
-My goal is to have an interface where I can quickly spin up some common databases on my Home Lab K3s cluster.
+## Key Features
 
-## Functionality
+- **Database Customization**: Users can create databases by specifying:
+  - A unique name for the database.
+  - The type of database (PostgreSQL, MySQL, MongoDB, Kafka).
+  - Storage size requirements.
+- **Automated Deployment**: The backend processes user requests and deploys databases using Helm charts.
+- **Credential Management**: Automatically generates and returns credentials for:
+  - Admin access.
+  - Read-only access.
+- **Monitoring Integration**: Provides a link to a Grafana dashboard for monitoring database status.
+- **Namespace Isolation**: Separates application components and user databases for better organization and security.
 
-From a web application, users will customize their DB by:
+## Technologies Used
 
-1. Providing a name for their database, e.g. `myprojectDB`
-2. Selecting their database application:
-    - mongoDB
-    - postgres
-    - kafka
-    - mySQL
+- **Frontend**: React.js
+  - Provides a user-friendly web interface for managing databases.
+  - Communicates with the backend via REST APIs.
+- **Backend**: Flask
+  - Handles API requests and interacts with the Kubernetes cluster.
+  - Uses the Kubernetes Python client for resource management.
+- **Kubernetes**:
+  - Manages database deployments, services, and persistent storage.
+  - Uses Helm charts for templated deployments.
+- **Helm**:
+  - Simplifies the deployment of database applications.
+  - Supports customization via values files.
+- **Grafana**:
+  - Provides monitoring and visualization for deployed databases.
+- **NGINX Ingress**:
+  - Routes traffic to the frontend and backend services.
 
-Once this is done, the backend will process this request and create a deployment matching their spec.
+## How It Works
 
-It will then return on the web app the following information:
-
-1. Credentials with pre-generated usernames and passwords:
-    - admin creds e.g. `myprojectDB-postgres_admin`
-    - read-only user creds e.g. `myprojectDB-postgres_ro`
-2. A link to a Graphana dashboard which shows the status of their database.
+1. **User Interaction**: Users interact with the web application to specify database details.
+2. **Backend Processing**: The backend validates the request, generates credentials, and deploys the database using Helm.
+3. **Database Deployment**: The database is deployed in the `databases` namespace, and credentials are stored in Kubernetes secrets.
+4. **Monitoring**: A Grafana dashboard link is provided for monitoring the database.
